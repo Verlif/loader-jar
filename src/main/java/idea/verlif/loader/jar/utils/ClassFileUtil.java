@@ -1,4 +1,4 @@
-package utils;
+package idea.verlif.loader.jar.utils;
 
 import java.io.File;
 import java.io.IOException;
