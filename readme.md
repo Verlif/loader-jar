@@ -9,9 +9,27 @@ jar文件加载器，用来加载jar中的实例。
 
 ```java
 JarLoader loader = new JarLoader("F:\\test\\jar");
-或
+// 或使用以下方式
 File file = new File("F:\\test\\jar")
 JarLoader loader = new JarLoader(file);
+```
+
+也可以使用`idea.verlif.loader.jar.config.FileFilter`来加载特定的jar包：
+
+```java
+// 新建文件过滤器
+FileFilter filter = new FileFilter();
+// 添加排除的文件总路径名(File.getAbsolutePath())正则表达式
+filter.exclude(".*beta.*", ".*test.*");
+// 添加包括的文件总路径名(File.getAbsolutePath())正则表达式
+// 使用了include(String...)后，exclude(String...)将会被无效化
+filter.include(".*release.*", ".*alpha.*");
+
+// 在新建JarLoader时添加过滤器
+JarLoader loader = new JarLoader("F:\\test", filter);
+// 或是在已有的JarLoader中添加过滤器，这是需要使用reload()方法来重载加载器
+oldLoader.setFileFilter(filter);
+oldLoader.reload();
 ```
 
 获取`JarLoader`后，就可以调用其方法了。
@@ -56,7 +74,7 @@ List<Thread> li = loader.getInstances(
 >        <dependency>
 >            <groupId>com.github.Verlif</groupId>
 >            <artifactId>loader-jar</artifactId>
->            <version>alpha-0.1</version>
+>            <version>0.1</version>
 >        </dependency>
 >    </dependencies>
 > ```
@@ -64,6 +82,6 @@ List<Thread> li = loader.getInstances(
 > Gradle
 > ```text
 > dependencies {
->   implementation 'com.github.Verlif:loader-jar:alpha-0.1'
+>   implementation 'com.github.Verlif:loader-jar:0.1'
 > }
 > ```

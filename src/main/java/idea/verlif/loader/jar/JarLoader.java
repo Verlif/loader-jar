@@ -1,8 +1,11 @@
 package idea.verlif.loader.jar;
 
+import idea.verlif.loader.jar.config.FileFilter;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -15,12 +18,26 @@ public class JarLoader {
     private final File file;
     private final List<JarHolder> holders;
 
+    private FileFilter fileFilter;
+
     /**
      * 目标文件或文件夹
      *
      * @param file 需要加载的jar文件或包含多个jar文件的文件夹
      */
     public JarLoader(File file) {
+        this(file, null);
+    }
+
+    public JarLoader(String path) {
+        this(new File(path));
+    }
+
+    public JarLoader(String path, FileFilter filter) {
+        this(new File(path), filter);
+    }
+
+    public JarLoader(File file, FileFilter filter) {
         if (file.isFile()) {
             this.file = file.getParentFile();
         } else {
@@ -28,17 +45,22 @@ public class JarLoader {
         }
 
         holders = new ArrayList<>();
-        loadJar();
+        this.fileFilter = filter;
+        reload();
     }
 
-    public JarLoader(String path) {
-        this(new File(path));
+    public void setFileFilter(FileFilter fileFilter) {
+        this.fileFilter = fileFilter;
+    }
+
+    public FileFilter getFileFilter() {
+        return fileFilter;
     }
 
     /**
-     * 加载JarHolder
+     * 重新加载JarHolder
      */
-    private void loadJar() {
+    private void reload() {
         if (file != null) {
             File[] files = file.listFiles();
             if (files != null) {
@@ -48,6 +70,8 @@ public class JarLoader {
             } else {
                 holders.addAll(loadJarFromFile(file));
             }
+
+            System.out.println(Arrays.toString(holders.toArray()));
         }
     }
 
@@ -61,8 +85,10 @@ public class JarLoader {
         List<JarHolder> list = new ArrayList<>();
         if (file.isFile()) {
             if (file.getName().endsWith(".jar")) {
-                JarHolder holder = new JarHolder(file);
-                list.add(holder);
+                if (fileFilter == null || fileFilter.match(file)) {
+                    JarHolder holder = new JarHolder(file);
+                    list.add(holder);
+                }
             }
         } else {
             File[] files = file.listFiles();

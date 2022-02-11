@@ -76,7 +76,9 @@ public class ClassFileUtil {
         return list;
     }
 
-    // 重构类名
+    /**
+     * 重构类名
+     */
     private static String rebuildClassName(String name) {
         if (name.contains("/")) {
             return name.replaceAll("/", ".");

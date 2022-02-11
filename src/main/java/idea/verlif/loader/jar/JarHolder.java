@@ -1,5 +1,7 @@
 package idea.verlif.loader.jar;
 
+import idea.verlif.loader.jar.utils.ClassFileUtil;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
@@ -8,24 +10,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import idea.verlif.loader.jar.utils.ClassFileUtil;
-
 /**
+ * Jar文件持有器
+ *
  * @author Verlif
  */
 public class JarHolder {
 
-    private final String path;
-
     private final File file;
 
     public JarHolder(String path) {
-        this.path = path;
         this.file = new File(path);
     }
 
     public JarHolder(File file) {
-        this.path = file.getPath();
         this.file = file;
     }
 
@@ -95,5 +93,12 @@ public class JarHolder {
             default:
                 return cl;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "JarHolder{" +
+                "file=" + file.getAbsolutePath() +
+                '}';
     }
 }
