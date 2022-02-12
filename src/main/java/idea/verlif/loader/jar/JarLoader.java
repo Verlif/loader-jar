@@ -37,12 +37,7 @@ public class JarLoader {
     }
 
     public JarLoader(File file, FileFilter filter) {
-        if (file.isFile()) {
-            this.file = file.getParentFile();
-        } else {
-            this.file = file;
-        }
-
+        this.file = file;
         holders = new ArrayList<>();
         this.fileFilter = filter;
         reload();
@@ -115,7 +110,10 @@ public class JarLoader {
     public <T> List<T> getInstances(Class<T> cl, Object... params) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         List<T> list = new ArrayList<>();
         for (JarHolder holder : holders) {
-            list.addAll(holder.getInstances(cl, params));
+            try {
+                list.addAll(holder.getInstances(cl, params));
+            } catch (Throwable ignored) {
+            }
         }
         return list;
     }

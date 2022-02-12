@@ -63,12 +63,14 @@ public class ClassFileUtil {
         try (URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{new URL(FILE_PREF + file.getPath())})) {
             // 获取所有的类
             for (String name : nameList) {
-                Class<?> acl = urlClassLoader.loadClass(rebuildClassName(name));
-                if (!Modifier.isAbstract(acl.getModifiers())
-                        && !Modifier.isInterface(acl.getModifiers())
-                        && cl.isAssignableFrom(acl)) {
-                    list.add((Class<T>) acl);
-                }
+                try {
+                    Class<?> acl = urlClassLoader.loadClass(rebuildClassName(name));
+                    if (!Modifier.isAbstract(acl.getModifiers())
+                            && !Modifier.isInterface(acl.getModifiers())
+                            && cl.isAssignableFrom(acl)) {
+                        list.add((Class<T>) acl);
+                    }
+                } catch (Throwable ignored) {}
             }
         } catch (Exception e) {
             e.printStackTrace();
