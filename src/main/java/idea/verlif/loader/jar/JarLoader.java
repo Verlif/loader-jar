@@ -5,7 +5,6 @@ import idea.verlif.loader.jar.config.FileFilter;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -70,8 +69,6 @@ public class JarLoader {
             } else {
                 holders.addAll(loadJarFromFile(file));
             }
-
-            System.out.println(Arrays.toString(holders.toArray()));
         }
     }
 
