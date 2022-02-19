@@ -74,7 +74,7 @@ List<Thread> li = loader.getInstances(
 >        <dependency>
 >            <groupId>com.github.Verlif</groupId>
 >            <artifactId>loader-jar</artifactId>
->            <version>0.1.2</version>
+>            <version>0.1.3</version>
 >        </dependency>
 >    </dependencies>
 > ```
@@ -82,6 +82,6 @@ List<Thread> li = loader.getInstances(
 > Gradle
 > ```text
 > dependencies {
->   implementation 'com.github.Verlif:loader-jar:0.1.2'
+>   implementation 'com.github.Verlif:loader-jar:0.1.3'
 > }
 > ```

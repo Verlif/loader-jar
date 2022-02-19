@@ -3,7 +3,6 @@ package idea.verlif.loader.jar;
 import idea.verlif.loader.jar.config.FileFilter;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +53,8 @@ public class JarLoader {
     /**
      * 重新加载JarHolder
      */
-    private void reload() {
+    public void reload() {
+        holders.clear();
         if (file != null) {
             File[] files = file.listFiles();
             if (files != null) {
@@ -107,12 +107,13 @@ public class JarLoader {
      * @param <T>    父类泛型
      * @return 子类实例列表
      */
-    public <T> List<T> getInstances(Class<T> cl, Object... params) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    public <T> List<T> getInstances(Class<T> cl, Object... params) {
         List<T> list = new ArrayList<>();
         for (JarHolder holder : holders) {
             try {
                 list.addAll(holder.getInstances(cl, params));
-            } catch (Throwable ignored) {
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
             }
         }
         return list;

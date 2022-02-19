@@ -79,4 +79,11 @@ public class FileFilter {
         }
     }
 
+    public Set<Pattern> getExclude() {
+        return exclude;
+    }
+
+    public Set<Pattern> getInclude() {
+        return include;
+    }
 }
