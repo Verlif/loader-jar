@@ -1,8 +1,9 @@
 package idea.verlif.loader.jar;
 
-import idea.verlif.loader.jar.config.FileFilter;
+import idea.verlif.loader.jar.config.JarFileFilter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,10 +14,12 @@ import java.util.List;
  */
 public class JarLoader {
 
+    private static final String FILE_JAR_SUFFIX = ".jar";
+
     private final File file;
     private final List<JarHolder> holders;
 
-    private FileFilter fileFilter;
+    private JarFileFilter jarFileFilter;
 
     /**
      * 目标文件或文件夹
@@ -31,40 +34,46 @@ public class JarLoader {
         this(new File(path));
     }
 
-    public JarLoader(String path, FileFilter filter) {
+    public JarLoader(String path, JarFileFilter filter) {
         this(new File(path), filter);
     }
 
-    public JarLoader(File file, FileFilter filter) {
+    public JarLoader(File file, JarFileFilter filter) {
         this.file = file;
-        holders = new ArrayList<>();
-        this.fileFilter = filter;
-        reload();
+        this.holders = new ArrayList<>();
+        this.jarFileFilter = filter;
     }
 
-    public void setFileFilter(FileFilter fileFilter) {
-        this.fileFilter = fileFilter;
+    public void setFileFilter(JarFileFilter jarFileFilter) {
+        this.jarFileFilter = jarFileFilter;
     }
 
-    public FileFilter getFileFilter() {
-        return fileFilter;
+    public JarFileFilter getFileFilter() {
+        return jarFileFilter;
     }
 
     /**
-     * 重新加载JarHolder
+     * 重新加载JarHolder。在进行类操作前需要进行加载才可以获取到文件中的类信息。
      */
     public void reload() {
         holders.clear();
         if (file != null) {
-            File[] files = file.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    holders.addAll(loadJarFromFile(file));
-                }
-            } else {
-                holders.addAll(loadJarFromFile(file));
-            }
+            holders.addAll(loadJarFromFile(file));
         }
+    }
+
+    /**
+     * 加载到的jar包数量
+     */
+    public int jarFileCount() {
+        return holders.size();
+    }
+
+    /**
+     * 获取所有加载的jar处理器
+     */
+    public List<JarHolder> getHolders() {
+        return holders;
     }
 
     /**
@@ -75,22 +84,15 @@ public class JarLoader {
      */
     public List<JarHolder> loadJarFromFile(File file) {
         List<JarHolder> list = new ArrayList<>();
-        if (file.isFile()) {
-            if (file.getName().endsWith(".jar")) {
-                if (fileFilter == null || fileFilter.match(file)) {
-                    JarHolder holder = new JarHolder(file);
-                    list.add(holder);
-                }
+        File[] files = file.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                list.addAll(loadJarFromFile(f));
             }
-        } else {
-            File[] files = file.listFiles();
-            if (files != null) {
-                for (File f : files) {
-                    list.addAll(loadJarFromFile(f));
-                }
-            }
+        } else if (file.getName().endsWith(FILE_JAR_SUFFIX) && (jarFileFilter == null || jarFileFilter.accept(file))) {
+            JarHolder holder = new JarHolder(file);
+            list.add(holder);
         }
-
         return list;
     }
 
@@ -107,15 +109,12 @@ public class JarLoader {
      * @param <T>    父类泛型
      * @return 子类实例列表
      */
-    public <T> List<T> getInstances(Class<T> cl, Object... params) {
+    public <T> List<T> getSubInstances(Class<T> cl, Object... params) throws IOException, ClassNotFoundException {
         List<T> list = new ArrayList<>();
         for (JarHolder holder : holders) {
-            try {
-                list.addAll(holder.getInstances(cl, params));
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            }
+            list.addAll(holder.getSubInstances(cl, params));
         }
         return list;
     }
+
 }

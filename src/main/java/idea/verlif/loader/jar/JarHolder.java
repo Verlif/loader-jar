@@ -1,14 +1,15 @@
 package idea.verlif.loader.jar;
 
 import idea.verlif.loader.jar.utils.ClassFileUtil;
+import idea.verlif.reflection.util.ReflectUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Constructor;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Jar文件持有器
@@ -42,57 +43,43 @@ public class JarHolder {
         return file;
     }
 
-    public <T> List<T> getInstances(Class<T> cl, Object... params) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    /**
+     * 列举所有可以被直接加载的类
+     */
+    public List<Class<Object>> listClass() throws IOException, ClassNotFoundException {
+        return ClassFileUtil.getSubClass(Object.class, file);
+    }
+
+    /**
+     * 列举所有的包括的类名称
+     */
+    public Set<String> listClassName() throws IOException {
+        return ClassFileUtil.getClassNameFromJar(file);
+    }
+
+    /**
+     * 获取类的所有子类实例
+     *
+     * @param cl     目标类
+     * @param params 实例构造器参数
+     * @param <T>    类泛型
+     * @return 实例列表
+     */
+    public <T> List<T> getSubInstances(Class<T> cl, Object... params) throws IOException, ClassNotFoundException {
         List<T> list = new ArrayList<>();
-        List<Class<T>> classes = ClassFileUtil.getAllClass(cl, file);
+        List<Class<T>> classes = ClassFileUtil.getSubClass(cl, file);
 
         for (Class<?> cla : classes) {
-            List<Constructor<?>> cLi = new ArrayList<>();
-            do {
-                cLi.addAll(Arrays.asList(cla.getConstructors()));
-                cla = cla.getSuperclass();
-            } while (cla != null);
-            for (Constructor<?> constructor : cLi) {
-                if (constructor.getParameterCount() == params.length) {
-                    Class<?>[] types = constructor.getParameterTypes();
-                    int flag = 0;
-                    for (int i = 0; i < types.length; i++) {
-                        if (recalculate(types[i]).isAssignableFrom(params[i].getClass())) {
-                            flag++;
-                        }
-                    }
-                    if (flag == types.length) {
-                        T t = (T) constructor.newInstance(params);
-                        list.add(t);
-                        break;
-                    }
-                }
+            T t = null;
+            try {
+                t = (T) ReflectUtil.newInstance(cla, params);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException ignored) {
+            }
+            if (t != null) {
+                list.add(t);
             }
         }
         return list;
-    }
-
-    private Class<?> recalculate(Class<?> cl) {
-        switch (cl.getSimpleName()) {
-            case "int":
-                return Integer.class;
-            case "double":
-                return Double.class;
-            case "float":
-                return Float.class;
-            case "byte":
-                return Byte.class;
-            case "short":
-                return Short.class;
-            case "long":
-                return Long.class;
-            case "boolean":
-                return Boolean.class;
-            case "char":
-                return Character.class;
-            default:
-                return cl;
-        }
     }
 
     @Override

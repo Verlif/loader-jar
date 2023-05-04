@@ -10,11 +10,13 @@ jar文件加载器，用来加载jar中的实例。
 ```java
 JarLoader loader = new JarLoader("F:\\test\\jar");
 // 或使用以下方式
-File file = new File("F:\\test\\jar")
+File file = new File("F:\\test\\jar");
 JarLoader loader = new JarLoader(file);
+// 开始加载类信息
+loader.reload();
 ```
 
-也可以使用`idea.verlif.loader.jar.config.FileFilter`来加载特定的jar包：
+也可以使用`idea.verlif.loader.jar.config.JarFileFilter`来加载特定的jar包：
 
 ```java
 // 新建文件过滤器
@@ -47,41 +49,43 @@ List<Thread> li = loader.getInstances(
 
 1. 添加Jitpack仓库源
 
-> maven
-> ```xml
-> <repositories>
->    <repository>
->        <id>jitpack.io</id>
->        <url>https://jitpack.io</url>
->    </repository>
-> </repositories>
-> ```
+   maven
+   ```xml
+   <repositories>
+      <repository>
+          <id>jitpack.io</id>
+          <url>https://jitpack.io</url>
+      </repository>
+   </repositories>
+   ```
 
-> Gradle
-> ```text
-> allprojects {
->   repositories {
->       maven { url 'https://jitpack.io' }
->   }
-> }
-> ```
+   Gradle
+   ```text
+   allprojects {
+     repositories {
+         maven { url 'https://jitpack.io' }
+     }
+   }
+   ```
 
 2. 添加依赖
 
-> maven
-> ```xml
->    <dependencies>
->        <dependency>
->            <groupId>com.github.Verlif</groupId>
->            <artifactId>loader-jar</artifactId>
->            <version>0.1.3</version>
->        </dependency>
->    </dependencies>
-> ```
+   __lastVersion__ [![reflection-kit](https://jitpack.io/v/Verlif/loader-jar.svg)](https://jitpack.io/#Verlif/loader-jar)
 
-> Gradle
-> ```text
-> dependencies {
->   implementation 'com.github.Verlif:loader-jar:0.1.3'
-> }
-> ```
+   maven
+   ```xml
+      <dependencies>
+          <dependency>
+              <groupId>com.github.Verlif</groupId>
+              <artifactId>loader-jar</artifactId>
+              <version>0.1.3</version>
+          </dependency>
+      </dependencies>
+   ```
+
+   Gradle
+   ```text
+   dependencies {
+     implementation 'com.github.Verlif:loader-jar:0.1.3'
+   }
+   ```
